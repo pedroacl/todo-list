@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	models "github.com/pedroacl/todo-list/models"
+	"github.com/pedroacl/todo-list/models"
 )
 
 func init() {

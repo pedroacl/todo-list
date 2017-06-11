@@ -4,10 +4,10 @@ import "time"
 
 // Post model
 type Post struct {
-	Title     string
-	Contente  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Title     string    `json:"name" binding:"required"`
+	Content   string    `json:"content" binding:"required"`
+	CreatedAt time.Time `json:"createdAt" binding:"required"`
+	UpdatedAt time.Time `json:"updatedAt" binding:"required"`
 }
 
 // Posts model

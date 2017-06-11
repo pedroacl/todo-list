@@ -20,6 +20,8 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		models.User{Name: "Luis"},
 	}
 
+	fmt.Println("here")
+
 	// json.NewEncoder(w).Encode(users)
 	usersJSON, err := json.Marshal(users)
 
