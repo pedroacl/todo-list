@@ -7,12 +7,9 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/pedroacl/todo-list/config"
 	"github.com/pedroacl/todo-list/helpers"
 )
-
-const secretKey = "mysecret"
-
-var mySigningKey = []byte(secretKey)
 
 // GetAuthToken return a JWT token
 func GetAuthToken(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +33,7 @@ func GetAuthToken(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign and get the complete encoded token as a string using the secret
-	signedToken, err := token.SignedString([]byte(secretKey))
+	signedToken, err := token.SignedString([]byte(config.MainConfig.SecretKey))
 
 	if err != nil {
 		fmt.Println(err)
@@ -55,6 +52,22 @@ func GetAuthToken(w http.ResponseWriter, r *http.Request) {
 	helpers.CreateJSONResponse(tokenJSON, http.StatusOK, w)
 }
 
+// Middleware to protect /profile and /logout
+func ValidateJWT(protectedPage http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		jwtToken := r.Header.Get("Auth-Token")
+		fmt.Println("The token: ", jwtToken)
+
+		// validate the token and if it passes call the protected handler below.
+		// isTokenValid := controllers.ValidateAuthToken(jwtToken)
+		isTokenValid := true
+
+		if isTokenValid {
+			protectedPage(w, r)
+		}
+	})
+}
+
 // getSecretKey returns our secret key
 func getSecretKey(token *jwt.Token) (interface{}, error) {
 	// validate the algorithm used
@@ -65,7 +78,7 @@ func getSecretKey(token *jwt.Token) (interface{}, error) {
 	}
 
 	// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-	return []byte(secretKey), nil
+	return []byte(config.MainConfig.SecretKey), nil
 }
 
 // Claims struct
@@ -75,8 +88,8 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-// ValidateAuthToken parses and validates a JWT token
-func ValidateAuthToken(tokenString string) bool {
+// validateAuthToken parses and validates a JWT token
+func validateAuthToken(tokenString string) bool {
 	// Parse takes the token string and a function for looking up the key. The latter is especially
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
@@ -96,9 +109,4 @@ func ValidateAuthToken(tokenString string) bool {
 	}
 
 	return true
-}
-
-// ValidateJWT validate the token
-func ValidateJWT() {
-
 }

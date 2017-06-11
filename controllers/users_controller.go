@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/pedroacl/todo-list/helpers"
 	"github.com/pedroacl/todo-list/models"
 )
 
@@ -20,12 +21,11 @@ type Message struct {
 
 // GetUsers returns a list of users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	users := models.Users{
-		models.User{Name: "Pedro"},
-		models.User{Name: "Luis"},
-	}
+	users := []models.User{}
+	users = append(users, models.User{Name: "Pedro"})
+	users = append(users, models.User{Name: "Luis"})
 
-	json.NewEncoder(w).Encode(users)
+	helpers.CreateJSONResponse(users, http.StatusOK, w)
 }
 
 // GetUser returns a user based on his id

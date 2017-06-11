@@ -7,16 +7,17 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/pedroacl/todo-list/config"
+	"github.com/pedroacl/todo-list/controllers"
 )
 
 func main() {
-	port := ":8080"
+	config.LoadConfiguration("local")
 
-	r := config.GetRoutes()
+	r := controllers.GetRoutes()
 	http.Handle("/", r)
 
 	fmt.Println("Server started!")
-	fmt.Println("Listening on port " + port)
+	fmt.Println("Listening on port " + config.MainConfig.Port)
 
-	http.ListenAndServe(port, handlers.LoggingHandler(os.Stdout, r))
+	http.ListenAndServe(config.MainConfig.Port, handlers.LoggingHandler(os.Stdout, r))
 }

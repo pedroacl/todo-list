@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-// User type
+// User model
 type User struct {
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
@@ -10,6 +10,3 @@ type User struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
-
-// Users type
-type Users []User

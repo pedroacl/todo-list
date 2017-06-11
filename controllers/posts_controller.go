@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -15,59 +14,30 @@ func init() {
 
 // GetPosts returns a list of posts
 func GetPosts(w http.ResponseWriter, r *http.Request) {
-	users := models.Users{
-		models.User{Name: "Pedro"},
-		models.User{Name: "Luis"},
-	}
+	posts := []models.Post{}
+	posts = append(posts, models.Post{Title: "Post 1"})
+	posts = append(posts, models.Post{Title: "Post 2"})
 
-	fmt.Println("here")
-
-	// json.NewEncoder(w).Encode(users)
-	usersJSON, err := json.Marshal(users)
-
-	if err != nil {
-		msg := Message{"Error getting posts"}
-		data, err := json.Marshal(msg)
-
-		if err != nil {
-			// TODO
-		}
-
-		helpers.CreateJSONResponse(data, http.StatusInternalServerError, w)
-		return
-	}
-
-	helpers.CreateJSONResponse(usersJSON, http.StatusOK, w)
+	helpers.CreateJSONResponse(posts, http.StatusOK, w)
 }
 
 // GetPost returns a post based on its id
 func GetPost(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	params := mux.Vars(r)
+	fmt.Println(params["id"])
 
-	fmt.Println(vars)
-	fmt.Println(r.Method)
+	post := models.Post{Title: "Post " + params["id"]}
 
-	m := Message{"Welcome user!"}
-	b, err := json.Marshal(m)
-
-	if err != nil {
-		panic(err)
-	}
-
-	helpers.CreateJSONResponse(b, http.StatusOK, w)
+	helpers.CreateJSONResponse(post, http.StatusOK, w)
 }
 
 // UpdatePost shows an edit post form
 func UpdatePost(w http.ResponseWriter, r *http.Request) {
-	m := Message{"Welcome user!"}
-	b, err := json.Marshal(m)
+	params := mux.Vars(r)
+	fmt.Println(params["id"])
 
-	if err != nil {
-		panic(err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+	msg := Message{"Post updated!"}
+	helpers.CreateJSONResponse(msg, http.StatusOK, w)
 }
 
 // CreatePost creates a new post
@@ -75,20 +45,20 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 
 	if err != nil {
-		// TODO handle error
+		fmt.Println(err)
 	}
 
-	post := new(models.Post)
-	err = decoder.Decode(post, r.PostForm)
+	var post models.Post
+	err = decoder.Decode(&post, r.PostForm)
 
 	if err != nil {
-		// TODO handle error
+		fmt.Println(err)
 	}
 
-	fmt.Println(post)
+	fmt.Println("The post:", post)
 }
 
 // DeletePost deletes a post based on its id
 func DeletePost(w http.ResponseWriter, r *http.Request) {
-
+	// TODO
 }
