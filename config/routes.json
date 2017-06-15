@@ -1,0 +1,14 @@
+[
+	{
+		"controller": "Posts Controller",
+		"path": "/users",
+		"method": "GET",
+		"handler": ""
+	},
+	{
+		"controller": "controller name",
+		"path": "the/path",
+		"method": "GET",
+		"handler": ""
+	}
+]

@@ -7,9 +7,16 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/pedroacl/todo-list/app/helpers"
 	"github.com/pedroacl/todo-list/config"
-	"github.com/pedroacl/todo-list/helpers"
 )
+
+// Claims struct
+type Claims struct {
+	Username string `json:"username"`
+	// recommended having
+	jwt.StandardClaims
+}
 
 // GetAuthToken return a JWT token
 func GetAuthToken(w http.ResponseWriter, r *http.Request) {
@@ -52,14 +59,14 @@ func GetAuthToken(w http.ResponseWriter, r *http.Request) {
 	helpers.CreateJSONResponse(tokenJSON, http.StatusOK, w)
 }
 
-// Middleware to protect /profile and /logout
+// ValidateJWT middleware to protect /profile and /logout
 func ValidateJWT(protectedPage http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		jwtToken := r.Header.Get("Auth-Token")
 		fmt.Println("The token: ", jwtToken)
 
 		// validate the token and if it passes call the protected handler below.
-		// isTokenValid := controllers.ValidateAuthToken(jwtToken)
+		// isTokenValid := validateAuthToken(jwtToken)
 		isTokenValid := true
 
 		if isTokenValid {
@@ -77,21 +84,13 @@ func getSecretKey(token *jwt.Token) (interface{}, error) {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 	}
 
-	// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 	return []byte(config.MainConfig.SecretKey), nil
-}
-
-// Claims struct
-type Claims struct {
-	Username string `json:"username"`
-	// recommended having
-	jwt.StandardClaims
 }
 
 // validateAuthToken parses and validates a JWT token
 func validateAuthToken(tokenString string) bool {
 	// Parse takes the token string and a function for looking up the key. The latter is especially
-	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
+	// useful if you use multiple keys for your application. The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
 	// to the callback, providing flexibility.
 	token, err := jwt.Parse(tokenString, getSecretKey)
@@ -105,6 +104,7 @@ func validateAuthToken(tokenString string) bool {
 	if !ok || !token.Valid {
 		fmt.Println("The claims: ", claims)
 		fmt.Println("Token is not valid:", err)
+
 		return false
 	}
 

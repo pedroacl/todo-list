@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/mgo.v2"
 	"os"
 )
 
@@ -15,9 +16,22 @@ type Config struct {
 // MainConfig the main configuration struct
 var MainConfig Config
 
-// LoadConfiguration load
-func LoadConfiguration(env string) {
-	var config Config
+// MongoDBSession database session
+var MongoDBSession *mgo.Session
+
+func getSession() *mgo.Session {
+	// Connect to our local mongo
+	s, err := mgo.Dial("mongodb://localhost:27017/todo-list")
+
+	// Check if connection error, is mongo running?
+	if err != nil {
+		panic(err)
+	}
+
+	return s
+}
+
+func getMainConfig(env string) Config {
 	var file string
 
 	if env == "local" {
@@ -27,7 +41,6 @@ func LoadConfiguration(env string) {
 	}
 
 	configFile, err := os.Open(file)
-
 	defer configFile.Close()
 
 	if err != nil {
@@ -35,7 +48,14 @@ func LoadConfiguration(env string) {
 	}
 
 	jsonParser := json.NewDecoder(configFile)
+	var config Config
 	jsonParser.Decode(&config)
 
-	MainConfig = config
+	return config
+}
+
+// LoadConfiguration load
+func LoadConfiguration(env string) {
+	MainConfig = getMainConfig("local")
+	MongoDBSession = getSession()
 }

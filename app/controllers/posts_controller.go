@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/pedroacl/todo-list/helpers"
-	"github.com/pedroacl/todo-list/models"
+	"github.com/pedroacl/todo-list/app/helpers"
+	"github.com/pedroacl/todo-list/app/models"
 )
 
 func init() {
