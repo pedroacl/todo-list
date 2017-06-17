@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -37,20 +38,27 @@ func loadRoutes(file string) []Route {
 	return routes
 }
 
-func getSession() *mgo.Session {
-	// Connect to our local mongo
-	s, err := mgo.Dial("mongodb://localhost:27017/todo-list")
+var mgoSession *mgo.Session
 
-	// Check if connection error, is mongo running?
-	if err != nil {
-		panic(err)
-	}
+// MgoSessionHandler middleware
+func MgoSessionHandler(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		//ctx := newContextWithMgoSession(req.Context(), req)
+		session, err := mgo.Dial("127.0.0.1:27017")
 
-	return s
+		if err != nil {
+			panic(err)
+		}
+
+		ctx := context.WithValue(req.Context(), mgoSession, session)
+		defer session.Close()
+
+		next.ServeHTTP(rw, req.WithContext(ctx))
+	})
 }
 
-// GetRoutes for the app
-func GetRoutes() *mux.Router {
+// GetRouter returns the router with its respective routes
+func GetRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/about", About).Methods("GET")
@@ -75,8 +83,8 @@ func GetRoutes() *mux.Router {
 
 	// labels
 	// labelsController := NewLabelsController(getSession())
-	r.HandleFunc("/labels", GetLabels).Methods("GET")
-	r.HandleFunc("/labels/{id}", GetLabelDetails).Methods("GET")
+	r.Handle("/labels", MgoSessionHandler(ValidateJWT(GetLabels))).Methods("GET")
+	r.Handle("/labels/{id}", MgoSessionHandler(ValidateJWT(GetLabelDetails))).Methods("GET")
 
 	// serve main index
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))

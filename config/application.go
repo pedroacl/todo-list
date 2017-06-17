@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	//"github.com/urfave/negroni"
 	"os"
 )
 
@@ -38,8 +39,28 @@ func getMainConfig(env string) Config {
 	return config
 }
 
+/*
+// MongoMiddleware middleware for handling a mgo session
+func MongoMiddleware() negroni.HandlerFunc {
+	// database := os.Getenv("DB_NAME")
+	database := "todo_list"
+	session, err := mgo.Dial("127.0.0.1:27017")
+
+	if err != nil {
+		panic(err)
+	}
+
+	return negroni.HandlerFunc(func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+		reqSession := session.Clone()
+		defer reqSession.Close()
+
+		ctx := r.Context().WithValue(r.Context(), mgoSession, reqSession)
+		next(rw, r.WithContext(ctx))
+	})
+}
+*/
+
 // LoadConfiguration load
 func LoadConfiguration(env string) {
 	MainConfig = getMainConfig("local")
-
 }
