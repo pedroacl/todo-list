@@ -64,10 +64,10 @@ func GetRouter() *mux.Router {
 	r.HandleFunc("/about", About).Methods("GET")
 
 	// get authentication token
-	r.HandleFunc("/getAuthToken", GetAuthToken).Methods("GET")
+	r.HandleFunc("/login", GetJWTHandler).Methods("GET")
 
 	// auth
-	r.HandleFunc("/auth", GetAuthToken).Methods("GET")
+	r.HandleFunc("/auth", GetJWTHandler).Methods("GET")
 
 	// users
 	r.HandleFunc("/users", ValidateJWTHandler(GetUsers)).Methods("GET")
