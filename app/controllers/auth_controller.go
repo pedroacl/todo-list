@@ -59,8 +59,8 @@ func GetAuthToken(w http.ResponseWriter, r *http.Request) {
 	helpers.CreateJSONResponse(tokenJSON, http.StatusOK, w)
 }
 
-// ValidateJWT middleware to protect /profile and /logout
-func ValidateJWT(protectedPage http.HandlerFunc) http.HandlerFunc {
+// ValidateJWTHandler middleware to protect /profile and /logout
+func ValidateJWTHandler(protectedPage http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		jwtToken := r.Header.Get("Auth-Token")
 		fmt.Println("The token: ", jwtToken)

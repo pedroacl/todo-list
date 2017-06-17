@@ -70,11 +70,11 @@ func GetRouter() *mux.Router {
 	r.HandleFunc("/auth", GetAuthToken).Methods("GET")
 
 	// users
-	r.HandleFunc("/users", ValidateJWT(GetUsers)).Methods("GET")
-	r.HandleFunc("/users/{id}", ValidateJWT(GetUser)).Methods("GET")
-	r.HandleFunc("/users/{id}", ValidateJWT(UpdateUser)).Methods("PUT")
-	r.HandleFunc("/users/{id}", ValidateJWT(DeleteUser)).Methods("DELETE")
-	r.HandleFunc("/users/new", ValidateJWT(CreateUser)).Methods("POST")
+	r.HandleFunc("/users", ValidateJWTHandler(GetUsers)).Methods("GET")
+	r.HandleFunc("/users/{id}", ValidateJWTHandler(GetUser)).Methods("GET")
+	r.HandleFunc("/users/{id}", ValidateJWTHandler(UpdateUser)).Methods("PUT")
+	r.HandleFunc("/users/{id}", ValidateJWTHandler(DeleteUser)).Methods("DELETE")
+	r.HandleFunc("/users/new", ValidateJWTHandler(CreateUser)).Methods("POST")
 
 	// posts
 	r.HandleFunc("/posts", GetPosts).Methods("GET")
@@ -83,8 +83,8 @@ func GetRouter() *mux.Router {
 
 	// labels
 	// labelsController := NewLabelsController(getSession())
-	r.Handle("/labels", MgoSessionHandler(ValidateJWT(GetLabels))).Methods("GET")
-	r.Handle("/labels/{id}", MgoSessionHandler(ValidateJWT(GetLabelDetails))).Methods("GET")
+	r.Handle("/labels", MgoSessionHandler(ValidateJWTHandler(GetLabels))).Methods("GET")
+	r.Handle("/labels/{id}", MgoSessionHandler(ValidateJWTHandler(GetLabelDetails))).Methods("GET")
 
 	// serve main index
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
